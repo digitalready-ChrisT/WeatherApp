@@ -1,0 +1,118 @@
+import com.example.weatherexample.WeatherFetch;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import java.io.IOException;
+import java.net.URL;
+
+public class testWeatherFetch {
+
+    @Test
+    void testFetchWeather() {
+        try {
+            double latitude = 40.7128;
+            double longitude = -74.006;
+            JSONObject weatherData = WeatherFetch.fetchWeather(latitude, longitude);
+            Assertions.assertNotNull(weatherData, "Weather data should not be null");
+            Assertions.assertEquals(weatherData.getDouble("lat"), latitude, 0.1);
+            Assertions.assertEquals(weatherData.getDouble("lon"), longitude, 0.1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void testConvertCitytothing() {
+        try {
+            String city = "Boston";
+            String state = "Massachusetts";
+            JSONObject weatherData = WeatherFetch.covertCityStatetoLatLon(city, state);
+            Assertions.assertNotNull(weatherData, "Weather data should not be null");
+            Assertions.assertEquals(weatherData.getString("name"), city);
+            Assertions.assertEquals(weatherData.getString("state"), state);
+            Assertions.assertEquals(weatherData.getDouble("lat"), 42.3554334, 0.1);
+            Assertions.assertEquals(weatherData.getDouble("lon"), -71.060511, 0.1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void testFetchWeatherByCityState_Success() {
+        try {
+            String city = "New York";
+            String state = "New York";
+            JSONObject weatherData = WeatherFetch.fetchWeatherByCityState(city, state);
+            Assertions.assertNotNull(weatherData, "Weather data should not be null");
+            // Add more assertions to validate the returned weather data if needed
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assertions.fail("An exception occurred while fetching weather data");
+        }
+    }
+
+    @Test
+    void testFetchWeatherByCityState_InvalidCityState() {
+        try {
+            String city = "InvalidCity";
+            String state = "InvalidState";
+            JSONObject weatherData = WeatherFetch.fetchWeatherByCityState(city, state);
+            Assertions.assertNull(weatherData, "Weather data should be null for invalid city/state");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assertions.fail("An exception occurred while fetching weather data");
+        }
+    }
+
+    @Test
+    void testFetchWeather_NetworkError() {
+        try {
+            // Provide an invalid URL to simulate network error
+            URL url = new URL("http://invalid-url");
+            JSONObject weatherData = WeatherFetch.fetchWeather(url);
+            Assertions.fail("Expected IOException due to network error, but the method executed successfully");
+        } catch (IOException e) {
+            // This is expected behavior
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    void testFetchJSON_Success() {
+        try {
+            URL url = new URL("https://api.example.com/data");
+            JSONObject jsonData = WeatherFetch.fetchJSON(url);
+            Assertions.assertNotNull(jsonData, "JSON data should not be null");
+            // Add more assertions to validate the JSON data if needed
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assertions.fail("An exception occurred while fetching JSON data");
+        }
+    }
+
+    @Test
+    void testFetchJSON_ErrorHandling() {
+        try {
+            // Provide an invalid URL to simulate error
+            URL url = new URL("http://invalid-url");
+            JSONObject jsonData = WeatherFetch.fetchJSON(url);
+            Assertions.fail("Expected IOException due to invalid URL, but the method executed successfully");
+        } catch (IOException e) {
+            // This is expected behavior
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    void testFetchWeatherByCityState_NullResult() {
+        try {
+            String city = "NonExistentCity";
+            String state = "NonExistentState";
+            JSONObject weatherData = WeatherFetch.fetchWeatherByCityState(city, state);
+            Assertions.assertNull(weatherData, "Weather data should be null for non-existent city/state");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assertions.fail("An exception occurred while fetching weather data");
+        }
+    }
+}
